@@ -6,9 +6,7 @@ import React from 'react'
 import toast from 'react-hot-toast';
 
 const Login = () => {
-
     const router = useRouter();                                                 //Getting the router object for navigation
-
     const loginForm = useFormik({
         initialValues: {
             email: '',
@@ -20,7 +18,8 @@ const Login = () => {
             axios.post('http://localhost:5000/user/authenticate', values)
                 .then((result) => {
                     toast.success("Login Successful");
-                    // console.log(result.data);//You can store the token in localStorage or context for further use
+                    // console.log(result.data);
+                    // You can store the token in localStorage or context for further use
                     localStorage.setItem('userToken', result.data.token); //Storing the JWT token in localStorage
                     router.push('/');  //Redirecting to home page after successful login
                 }).catch((err) => {

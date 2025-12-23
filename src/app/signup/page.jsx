@@ -1,50 +1,51 @@
-'use client';                                                     //to enable client side rendering
+'use client';
 import axios from 'axios';
 import { useFormik } from 'formik';
 import React from 'react'
 import toast from 'react-hot-toast';
 import * as Yup from 'yup';
+import { useRouter } from 'next/navigation';
 
-const SignupSchema = Yup.object().shape({                        //schema for form validation
+const SignupSchema = Yup.object().shape({
     name: Yup.string().min(2, 'Too Short!').max(30, 'Too Long!').required('naam nahi hai kya...'),
     email: Yup.string().email('Invalid email').required('email chahiye bhai...!'),
     password: Yup.string()
         .matches(/[a-z]/, "password mein ek lowercase letter hona chahiye")
         .matches(/[A-Z]/, "password mein ek uppercase letter hona chahiye")
         .matches(/[0-9]/, "password mein ek number hona chahiye")
-        .matches(/\W/, "password mein ek special character hona chahiye")    //special character
+        .matches(/\W/, "password mein ek special character hona chahiye")
         .min(8, 'Password too short')
         .required('password chahiye bhai...!'),
     confirmPassword: Yup.string().required('confirm your password').oneOf([Yup.ref('password')], 'Passwords alag hai bhai...!')
 });
 
 const SignUp = () => {
+    const router = useRouter();
 
-    const signupForm = useFormik({                                  //useFormik is a hook that takes care of form state and submission
-        initialValues: {                                              //initial values of the form fields
+    const signupForm = useFormik({
+        initialValues: {
             name: '',
             email: '',
             password: '',
-            confirmPassword: ''
+            confirmPassword: '',
+            termsAccepted: Yup.boolean().oneOf([true], 'Terms accept karna padega bhai!')
         },
-        onSubmit: (values, { resetForm }) => {                        //function to handle form submission
+        onSubmit: (values, { resetForm }) => {
             console.log(values);
 
-            axios.post('http://localhost:5000/user/add', values)        //sending a POST request to the server with form data
+            axios.post('http://localhost:5000/user/add', values)
                 .then((response) => {
-                    toast.success("User Registered Successfully..!!");      //showing success message
-                    resetForm();                                            //resetting the form fields
-                    router.push('/login');                                  //redirecting to login page after successful signup
+                    toast.success("User Registered Successfully..!!");
+                    resetForm();
+                    router.push('/login');
                 })
                 .catch((error) => {
-                    toast.error("User Registration Failed..!!");            //showing error message
+                    toast.error("User Registration Failed..!!");
                     console.log(error);
                 });
-
         },
-        validationSchema: SignupSchema,                               //attaching the validation schema to the form
+        validationSchema: SignupSchema,
     });
-
     return (
         <div className="mt-7 w-1/3 mx-auto bg-white border border-gray-200 rounded-xl shadow-2xs dark:bg-neutral-600 dark:border-neutral-800">
             <div className="p-4 sm:p-7">

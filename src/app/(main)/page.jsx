@@ -13,8 +13,8 @@ const Home = () => {
 
                 {/* Right side: Nav links */}
                 <div className="flex gap-6 text-gray-300 font-semibold">
-                    <Link href="/about">
-                        <span className="hover:text-teal-400 cursor-pointer">About Us</span>
+                    <Link href="/about-us" 
+                        className="hover:text-teal-400">About Us
                     </Link>
                     <Link href="/login">
                         <span className="hover:text-teal-400 cursor-pointer">Login</span>

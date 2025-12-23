@@ -1,29 +1,38 @@
 'use client';
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 const ApiTester = () => {
-    
-    const [url, setUrl] = useState('');                             // State for API URL
-    const [method, setMethod] = useState('GET');                    // State for HTTP method
-    const [body, setBody] = useState('');                           // State for request body
-    const [response, setResponse] = useState(null);                 // State for API response  
-    const [activeTab, setActiveTab] = useState('Body');             // State for active request tab
-    const [responseTab, setResponseTab] = useState('Response');     // State for active response tab
+    const [url, setUrl] = useState('');             // API URL
+    const [method, setMethod] = useState('GET');    // HTTP method
+    const [body, setBody] = useState('');           // Request body
+    const [response, setResponse] = useState(null); // API response
+    const [activeTab, setActiveTab] = useState('Body');
+    const [responseTab, setResponseTab] = useState('Response');
+    const [savedRequests, setSavedRequests] = useState([]); // ✅ Saved requests
+    const [headers, setHeaders] = useState([{ key: '', value: '' }]);
 
-    const sendRequest = async () => {                               // Function to send API request
-        try {                                                       // Function to send API request 
-            const res = await axios({                               // Axios request configuration
-                method: method,                                     // HTTP Method          
-                url: url,                                                  
-                data: body ? JSON.parse(body) : null,               // Request body (parsed as JSON)   
+
+    const sendRequest = async () => {
+        try {
+            const res = await axios({
+                method,
+                url,
+                data: body ? JSON.parse(body) : null,
             });
-            setResponse(res.data);                                  // Set response data
-        } catch (error) {                                           // Handle errors
-            setResponse({ error: error.message });                  // Set error message in response
+            setResponse(res.data);
+        } catch (error) {
+            setResponse({ error: error.message });
         }
-    }
+    };
+
+    // ✅ Save request function
+    const saveRequest = () => {
+        const newRequest = { url, method, body };
+        setSavedRequests([...savedRequests, newRequest]);
+        alert('Request saved!');
+        localStorage.setItem('savedRequests', JSON.stringify(savedRequests));
+    };
 
     return (
         <div className="min-h-screen bg-gray-900 text-gray-200 font-mono p-6">
@@ -39,13 +48,13 @@ const ApiTester = () => {
                     <input
                         type="text"
                         value={url}
-                        onChange={e => setUrl(e.target.value)}  // Update URL state on change
+                        onChange={(e) => setUrl(e.target.value)}
                         placeholder="Enter API URL"
                         className="flex-1 bg-gray-700 text-white px-4 py-2 rounded focus:outline-none"
                     />
                     <select
                         value={method}
-                        onChange={e => setMethod(e.target.value)}
+                        onChange={(e) => setMethod(e.target.value)}
                         className="bg-gray-700 text-white px-2 py-2 rounded focus:outline-none"
                     >
                         <option>GET</option>
@@ -60,15 +69,24 @@ const ApiTester = () => {
                     >
                         Send
                     </button>
+                    {/* ✅ New Save button */}
+                    <button
+                        onClick={saveRequest}
+                        className="bg-orange-400 text-black font-bold px-4 py-2 rounded hover:bg-orange-300 transition"
+                    >
+                        Save
+                    </button>
                 </div>
 
                 {/* Tabs */}
                 <div className="flex gap-4 border-b border-gray-600 mb-4">
-                    {['Headers', 'Auth', 'Body', 'Tests', 'Pre Run'].map(tab => (  // Mapping through tabs
+                    {['Headers', 'Auth', 'Body', 'Tests', 'Pre Run'].map((tab) => (
                         <button
                             key={tab}
-                            onClick={() => setActiveTab(tab)}                      // Set active tab on click
-                            className={`px-4 py-2 ${activeTab === tab ? 'border-b-2 border-teal-400 text-teal-400' : 'text-gray-400'
+                            onClick={() => setActiveTab(tab)}
+                            className={`px-4 py-2 ${activeTab === tab
+                                ? 'border-b-2 border-teal-400 text-teal-400'
+                                : 'text-gray-400'
                                 }`}
                         >
                             {tab}
@@ -77,23 +95,25 @@ const ApiTester = () => {
                 </div>
 
                 {/* Body Input */}
-                {activeTab === 'Body' && (                                          // Only show body input for 'Body' tab
+                {activeTab === 'Body' && (
                     <textarea
-                        value={body}                                                // Controlled component for request body
-                        onChange={e => setBody(e.target.value)}                     // Update body state on change
+                        value={body}
+                        onChange={(e) => setBody(e.target.value)}
                         className="w-full bg-gray-700 text-white p-4 rounded h-40 resize-none focus:outline-none"
                     />
                 )}
             </div>
 
-            {/*Response Viewer*/}
+            {/* Response Viewer */}
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
                 <div className="flex gap-4 border-b border-gray-600 mb-4">
-                    {['Response', 'Headers', 'Cookies', 'Results', 'Docs'].map(tab => (// Mapping through response tabs
+                    {['Response', 'Headers', 'Cookies', 'Results', 'Docs'].map((tab) => (
                         <button
-                            key={tab}                                                  // Set response tab on click
-                            onClick={() => setResponseTab(tab)}                        // Set response tab on click
-                            className={`px-4 py-2 ${responseTab === tab ? 'border-b-2 border-orange-400 text-orange-400' : 'text-gray-400'
+                            key={tab}
+                            onClick={() => setResponseTab(tab)}
+                            className={`px-4 py-2 ${responseTab === tab
+                                ? 'border-b-2 border-orange-400 text-orange-400'
+                                : 'text-gray-400'
                                 }`}
                         >
                             {tab}
@@ -101,12 +121,28 @@ const ApiTester = () => {
                     ))}
                 </div>
 
-                {/*Response Display*/}
+                {/* Response Display */}
                 <div className="bg-gray-700 p-4 rounded overflow-auto max-h-96">
                     <pre className="text-sm text-green-300">
                         {response ? JSON.stringify(response, null, 2) : '// Response will appear here'}
                     </pre>
                 </div>
+            </div>
+
+            {/* ✅ Saved Requests Viewer */}
+            <div className="mt-8 bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 className="text-xl font-bold text-orange-400 mb-4">📂 Saved Requests</h2>
+                {savedRequests.length === 0 ? (
+                    <p className="text-gray-400">No requests saved yet.</p>
+                ) : (
+                    <ul className="list-disc ml-6 text-gray-300">
+                        {savedRequests.map((req, index) => (
+                            <li key={index}>
+                                <span className="text-teal-400">{req.method}</span> → {req.url}
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
 
             {/* Shortcuts */}
@@ -119,7 +155,7 @@ const ApiTester = () => {
                 </ul>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default ApiTester;
