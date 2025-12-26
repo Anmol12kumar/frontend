@@ -28,7 +28,7 @@ const Home = () => {
             {/* Hero Section */}
             <section className="relative flex flex-col items-center justify-center text-center py-20 px-6 bg-gradient-to-r from-blue-900 via-gray-900 to-teal-900">
                 <h1 className="text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-teal-300 to-orange-400">
-                    🚀 API Testing Tool
+                    🚀API Testing Tool
                 </h1>
                 <p className="mt-4 text-xl text-gray-300 max-w-2xl">
                     A modern developer suite to build, test, and debug APIs with speed and precision.
